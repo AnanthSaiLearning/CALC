@@ -39,8 +39,8 @@ jobs:
         command: 'build'
         projects: 'Source_code/MathOperationApp.sln'
 
-- job: 'Build Docker Image'
-  dependsOn: MathCalAPP
+- job: 'Build_Docker_Image'
+  dependsOn: 'MathCalAPP'
   condition: succeeded()
   steps:
     - task: DockerInstaller@0
