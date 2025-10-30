@@ -34,7 +34,7 @@ jobs:
         projects: 'Source_code/MathOperationApp.sln'
     
     - task: DotNetCoreCLI@2
-      displayName: 'dotnet restore'
+      displayName: 'dotnet build'
       inputs:
         command: 'build'
         projects: 'Source_code/MathOperationApp.sln'
