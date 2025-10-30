@@ -31,11 +31,11 @@ jobs:
       displayName: 'dotnet restore'
       inputs:
         command: 'restore'
-        projects: 'MathOperationApp.sln'
+        projects: 'Source_code/MathOperationApp.sln'
     
     - task: DotNetCoreCLI@2
       displayName: 'dotnet restore'
       inputs:
         command: 'build'
-        projects: 'MathOperationApp.sln'
+        projects: 'Source_code/MathOperationApp.sln'
 
