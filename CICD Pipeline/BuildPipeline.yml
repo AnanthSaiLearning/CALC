@@ -39,3 +39,13 @@ jobs:
         command: 'build'
         projects: 'Source_code/MathOperationApp.sln'
 
+- job: 'Build Docker Image'
+  dependsOn: MathCalAPP
+  condition: succeeded()
+  steps:
+    - task: DockerInstaller@0
+      displayName: Docker Installer
+      inputs:
+        dockerVersion: 17.09.0-ce
+        releaseType: stable
+
