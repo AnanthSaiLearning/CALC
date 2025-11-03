@@ -1,0 +1,50 @@
+trigger:
+  batch: true
+  branches:
+    include:
+      - dev
+      - master
+
+pr:
+  autoCancel: true
+  branches:
+    include:
+      - '*'
+
+pool: 'Devops'
+
+jobs:
+- job: 'MathCalAPP'
+  steps:
+    # Install .NET SDK
+    - task: UseDotNet@2
+      inputs:
+        packageType: 'sdk'
+        version: '9.0.x'
+        installationPath: $(Agent.ToolsDirectory)/dotnet
+
+    - task: NuGetToolInstaller@1
+      inputs:
+        checkLatest: true
+    
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet restore'
+      inputs:
+        command: 'restore'
+        projects: 'Source_code/MathOperationApp.sln'
+    
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet build'
+      inputs:
+        command: 'build'
+        projects: 'Source_code/MathOperationApp.sln'
+
+- job: 'Build_Docker_Image'
+  dependsOn: 'MathCalAPP'
+  condition: succeeded()
+  steps:
+    - task: DockerInstaller@0
+      displayName: Docker Installer
+      inputs:
+        dockerVersion: 17.09.0-ce
+        releaseType: stable
