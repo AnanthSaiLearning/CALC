@@ -1,0 +1,66 @@
+trigger:
+  batch: true
+  branches:
+    include:
+      - dev
+      - master
+
+pool:
+  vmImage: 'ubuntu-22.04'
+
+variables:
+  - group: 'AzureServiceConnection'
+  - group: 'AzureVMConfiguration'
+
+  - name: RegionPrefix
+    value: ''
+
+parameters:
+  - name: AzureLocation
+    displayName: 'Azure Location'
+    type: string
+    default: 'francecentral'
+    values:
+      - 'francecentral'
+      - 'westeurope'
+
+jobs:
+- job: InitAzureVmSetup
+  displayName: 'Initiate Azure VM setup'
+  steps:
+    # Single AzureCLI task: uses service connection for auth
+    - task: AzureCLI@2
+      displayName: 'Run initial setup checks'
+      inputs:
+        azureSubscription: '$(ServiceConnectionName)'
+        scriptType: bash
+        scriptLocation: inlineScript
+        failOnStandardError: true
+        env: 
+          AZURE_CLIENT_ID:        $(AzureServiceConnection.ClientId)
+          AZURE_TENANT_ID:        $(AzureServiceConnection.TenantId)
+          AZURE_SUBSCRIPTION_ID:  $(AzureServiceConnection.SubscriptionId)
+          AZURE_CLIENT_SECRET:    $(AzureServiceConnection.ClientSecret)
+
+        inlineScript: |
+          set -euo pipefail
+
+          echo "Azure Login with Service Principal..."
+
+          az login --service-principal \
+            -u "$AZURE_CLIENT_ID" \
+            -p "$AZURE_CLIENT_SECRET" \
+            --tenant "$AZURE_TENANT_ID" 1>/dev/null
+
+          az account set --subscription "$AZURE_SUBSCRIPTION_ID"
+
+          echo "Logged in as SP: $(az account show --query user.name -o tsv)"
+
+
+          LOCATION='${{ parameters.AzureLocation }}'
+
+          echo "Checking if build VM exists..."
+          
+          az vm list --query "[].{Name:name, Location:$LOCATION}" -o tsv | grep "test" && \
+            echo "Build VM already exists in location: $LOCATION" || \
+            echo "Build VM does not exist. Proceeding with creation..."
