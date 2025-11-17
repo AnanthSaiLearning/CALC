@@ -34,7 +34,7 @@ steps:
 
       echo "Opening SSH Port..."
       az vm open-port \
-        --resource-group $DevopsLearning-rg \
+        --resource-group $RG_NAME \
         --name $VM_NAME \
         --port 22
 
