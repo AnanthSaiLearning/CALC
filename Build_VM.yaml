@@ -25,12 +25,12 @@ steps:
       echo "Creating Linux VM..."
       az vm create \
         --resource-group $DevopsLearning-rg \
-        --name $slazbuildVM03 \
+        --name $VM_NAME \
         --image Ubuntu2204 \
         --admin-username $ADMIN_USER \
         --admin-password "$ADMIN_PASS" \
         --size Standard_B2s \
-        --location $francecentral
+        --location $LOCATION
 
       echo "Opening SSH Port..."
       az vm open-port \
