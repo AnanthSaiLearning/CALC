@@ -24,7 +24,7 @@ steps:
 
       echo "Creating Linux VM..."
       az vm create \
-        --resource-group $DevopsLearning-rg \
+        --resource-group $RG_NAME \
         --name $VM_NAME \
         --image Ubuntu2204 \
         --admin-username $ADMIN_USER \
