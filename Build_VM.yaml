@@ -1,0 +1,43 @@
+trigger: none
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: 'Az-Sc_devops'   # Your managed identity service connection
+    scriptType: bash
+    scriptLocation: inlineScript
+    inlineScript: |
+
+      echo "Logged into Azure using Managed Identity Service Connection"
+
+      RG_NAME="DevopsLearning-rg"
+      LOCATION="francecentral"
+      VM_NAME="slazbuildVM03"
+      ADMIN_USER="azureuser"
+      ADMIN_PASS="MyP@ssword530"  # Store in variable as secret
+
+      echo "Creating Resource Group if not exists..."
+      az group create --name $RG_NAME --location $LOCATION
+
+      echo "Creating Linux VM..."
+      az vm create \
+        --resource-group $DevopsLearning-rg \
+        --name $slazbuildVM03 \
+        --image Ubuntu2204 \
+        --admin-username $ADMIN_USER \
+        --admin-password "$ADMIN_PASS" \
+        --size Standard_B2s \
+        --location $francecentral
+
+      echo "Opening SSH Port..."
+      az vm open-port \
+        --resource-group $DevopsLearning-rg \
+        --name $VM_NAME \
+        --port 22
+
+      echo "VM Creation Complete!"
+  env:
+    VM_ADMIN_PASSWORD: $(VM_ADMIN_PASSWORD)
