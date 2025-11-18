@@ -6,31 +6,81 @@ pool:
 steps:
 - task: AzureCLI@2
   inputs:
-    azureSubscription: 'Az-Sc_devops'   # Your managed identity service connection
+    azureSubscription: 'Az-Sc_devops'
     scriptType: bash
     scriptLocation: inlineScript
     inlineScript: |
 
-      echo "Logged into Azure using Managed Identity Service Connection"
+      echo "=== Starting Azure VM Deployment==="
 
       RG_NAME="DevopsLearning-rg"
       LOCATION="francecentral"
       VM_NAME="slazbuildVM03"
-      NSG=""
       ADMIN_USER="azureuser"
-      ADMIN_PASS="MyP@ssword530"  # Store in variable as secret
+      ADMIN_PASS="$VM_ADMIN_PASSWORD"
 
-      echo "Creating Resource Group if not exists..."
+      VNET_NAME="TestVnet"
+      SUBNET_NAME="TestSubnet"
+      ADDRESS_SPACE="10.0.0.0/16"
+      SUBNET_PREFIX="10.0.1.0/24"
+
+      NSG_NAME="Devops_nsg"
+      PUBLIC_IP_NAME="167.103.75.35"
+      NIC_NAME="Learning_NIC"
+
+      STORAGE_NAME="diag$(echo $RANDOM | tr -d '\n')"  # unique storage name
+
+      echo "=== Creating Resource Group ==="
       az group create --name $RG_NAME --location $LOCATION
 
-      echo "Creating Linux VM..."
+      echo "=== Creating Storage Account ==="
+      az storage account create \
+        --name $STORAGE_NAME \
+        --resource-group $RG_NAME \
+        --location $LOCATION \
+        --sku Standard_LRS
+
+      echo "=== Creating Virtual Network ==="
+      az network vnet create \
+        --resource-group $RG_NAME \
+        --name $VNET_NAME \
+        --address-prefix $ADDRESS_SPACE \
+        --subnet-name $SUBNET_NAME \
+        --subnet-prefix $SUBNET_PREFIX
+
+      echo "=== Creating NSG (NO Port Rules) ==="
+      az network nsg create \
+        --resource-group $RG_NAME \
+        --name $NSG_NAME
+
+      # NOTE: No SSH rule, NSG is empty
+
+      echo "=== Creating Public IP ==="
+      az network public-ip create \
+        --resource-group $RG_NAME \
+        --name $PUBLIC_IP_NAME \
+        --sku Basic \
+        --allocation-method Dynamic
+
+      echo "=== Creating NIC ==="
+      az network nic create \
+        --resource-group $RG_NAME \
+        --name $NIC_NAME \
+        --vnet-name $VNET_NAME \
+        --subnet $SUBNET_NAME \
+        --network-security-group $NSG_NAME \
+        --public-ip-address $PUBLIC_IP_NAME
+
+      echo "=== Creating Linux VM ==="
       az vm create \
         --resource-group $RG_NAME \
         --name $VM_NAME \
+        --nics $NIC_NAME \
         --image Ubuntu2204 \
         --admin-username $ADMIN_USER \
         --admin-password "$ADMIN_PASS" \
         --size Standard_B2s \
+        --boot-diagnostics-storage $STORAGE_NAME \
         --location $LOCATION
 
-      echo "VM Creation Complete!"
+      echo "=== VM Deployment Completed Successfully ==="
