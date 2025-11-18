@@ -28,7 +28,7 @@ steps:
       PUBLIC_IP_NAME="167.103.75.35"
       NIC_NAME="Learning_NIC"
 
-      STORAGE_NAME="diag$(echo $RANDOM | tr -d '\n')"  # unique storage name
+      STORAGE_NAME="DevopsAccount_storage"  # unique storage name
 
       echo "=== Creating Resource Group ==="
       az group create --name $RG_NAME --location $LOCATION
