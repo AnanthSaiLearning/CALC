@@ -16,6 +16,7 @@ steps:
       RG_NAME="DevopsLearning-rg"
       LOCATION="francecentral"
       VM_NAME="slazbuildVM03"
+      NSG=""
       ADMIN_USER="azureuser"
       ADMIN_PASS="MyP@ssword530"  # Store in variable as secret
 
@@ -32,12 +33,4 @@ steps:
         --size Standard_B2s \
         --location $LOCATION
 
-      echo "Opening SSH Port..."
-      az vm open-port \
-        --resource-group $RG_NAME \
-        --name $VM_NAME \
-        --port 22
-
       echo "VM Creation Complete!"
-  env:
-    VM_ADMIN_PASSWORD: $(VM_ADMIN_PASSWORD)
