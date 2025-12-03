@@ -34,7 +34,7 @@ steps:
       echo "=== Creating Resource Group ==="
       az group create --name $RG_NAME --location $LOCATION
 
-      echo "=== Creating Storage Account (TLS 1.2, HTTPS only) ==="
+      echo "=== Creating Storage Account ==="
       az storage account create \
         --name $STORAGE_NAME \
         --resource-group $RG_NAME \
@@ -88,7 +88,7 @@ steps:
         --admin-username $ADMIN_USER \
         --admin-password "$ADMIN_PASS" \
         --authentication-type password \
-        --size Standard_B2s \
+        --size Standard_B4ms \
         --boot-diagnostics-storage $STORAGE_NAME \
         --location $LOCATION
 
