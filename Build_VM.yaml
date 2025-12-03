@@ -88,3 +88,5 @@ steps:
         --location $LOCATION
 
       echo "=== VM Deployment Completed Successfully ==="
+  env:
+    VM_ADMIN_PASSWORD: $(VM_ADMIN_PASSWORD)
