@@ -40,7 +40,6 @@ steps:
         --resource-group $RG_NAME \
         --location $LOCATION \
         --sku Standard_LRS \
-        --kind StorageV2 \
         --https-only true \
         --min-tls-version TLS1_2
 
