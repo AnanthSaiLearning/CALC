@@ -11,7 +11,9 @@ steps:
     scriptLocation: inlineScript
     inlineScript: |
 
-      echo "=== Starting Azure VM Deployment==="
+      set -e
+
+      echo "=== Starting Azure VM Deployment ==="
 
       RG_NAME="DevopsLearning-rg"
       LOCATION="francecentral"
@@ -25,10 +27,11 @@ steps:
       SUBNET_PREFIX="10.0.1.0/24"
 
       NSG_NAME="Devops_nsg"
-      PUBLIC_IP_NAME="167.103.134.214"
+      PUBLIC_IP_NAME="devopslearning-pip01"   # resource NAME, not IP address
       NIC_NAME="Learning_NIC"
 
-      STORAGE_NAME="varanasi$(echo $RANDOM)"  # unique storage name
+      # storage account name: lowercase, letters/numbers only, globally unique
+      STORAGE_NAME="varanasilsa$RANDOM"
 
       echo "=== Creating Resource Group ==="
       az group create --name $RG_NAME --location $LOCATION
@@ -48,19 +51,17 @@ steps:
         --subnet-name $SUBNET_NAME \
         --subnet-prefix $SUBNET_PREFIX
 
-      echo "=== Creating NSG (NO Port Rules) ==="
+      echo "=== Creating NSG (no custom rules) ==="
       az network nsg create \
         --resource-group $RG_NAME \
         --name $NSG_NAME
 
-      # NOTE: No SSH rule, NSG is empty
-
-      echo "=== Creating Public IP ==="
+      echo "=== Creating Public IP (Standard, Static) ==="
       az network public-ip create \
         --resource-group $RG_NAME \
         --name $PUBLIC_IP_NAME \
-        --sku Basic \
-        --allocation-method Dynamic
+        --sku Standard \
+        --allocation-method Static
 
       echo "=== Creating NIC ==="
       az network nic create \
@@ -79,6 +80,7 @@ steps:
         --image Ubuntu2204 \
         --admin-username $ADMIN_USER \
         --admin-password "$ADMIN_PASS" \
+        --authentication-type password \
         --size Standard_B2s \
         --boot-diagnostics-storage $STORAGE_NAME \
         --location $LOCATION
