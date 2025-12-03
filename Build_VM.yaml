@@ -28,7 +28,7 @@ steps:
       PUBLIC_IP_NAME="167.103.75.35"
       NIC_NAME="Learning_NIC"
 
-      STORAGE_NAME="#V@r@n@si"  # unique storage name
+      STORAGE_NAME="#Va@r@n@si_SA01"  # unique storage name
 
       echo "=== Creating Resource Group ==="
       az group create --name $RG_NAME --location $LOCATION
