@@ -10,7 +10,6 @@ steps:
     scriptType: bash
     scriptLocation: inlineScript
     inlineScript: |
-
       set -e
 
       echo "=== Starting Azure VM Deployment ==="
@@ -35,7 +34,7 @@ steps:
       echo "=== Creating Resource Group ==="
       az group create --name $RG_NAME --location $LOCATION
 
-      echo "=== Creating Storage Account ==="
+      echo "=== Creating Storage Account (TLS 1.2, HTTPS only) ==="
       az storage account create \
         --name $STORAGE_NAME \
         --resource-group $RG_NAME \
@@ -74,6 +73,12 @@ steps:
         --network-security-group $NSG_NAME \
         --public-ip-address $PUBLIC_IP_NAME
 
+      echo "=== Validating VM password presence ==="
+      if [ -z "$ADMIN_PASS" ]; then
+        echo "ERROR: VM_ADMIN_PASSWORD is empty or not set in pipeline variables."
+        exit 1
+      fi
+
       echo "=== Creating Linux VM ==="
       az vm create \
         --resource-group $RG_NAME \
@@ -88,5 +93,6 @@ steps:
         --location $LOCATION
 
       echo "=== VM Deployment Completed Successfully ==="
+
   env:
     VM_ADMIN_PASSWORD: $(VM_ADMIN_PASSWORD)
