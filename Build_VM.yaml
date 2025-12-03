@@ -87,7 +87,8 @@ steps:
         --admin-username $ADMIN_USER \
         --admin-password "$ADMIN_PASS" \
         --authentication-type password \
-        --size Standard_B4ms \
+        --os-disk-size-gb 32 \
+        --storage-sku Standard_LRS \
         --boot-diagnostics-storage $STORAGE_NAME \
         --location $LOCATION
 
