@@ -27,10 +27,9 @@ steps:
       SUBNET_PREFIX="10.0.1.0/24"
 
       NSG_NAME="Devops_nsg"
-      PUBLIC_IP_NAME="devopslearning-pip01"   # resource NAME, not IP address
+      PUBLIC_IP_NAME="devopslearning-pip01"
       NIC_NAME="Learning_NIC"
 
-      # storage account name: lowercase, letters/numbers only, globally unique
       STORAGE_NAME="varanasilsa$RANDOM"
 
       echo "=== Creating Resource Group ==="
@@ -41,7 +40,10 @@ steps:
         --name $STORAGE_NAME \
         --resource-group $RG_NAME \
         --location $LOCATION \
-        --sku Standard_LRS
+        --sku Standard_LRS \
+        --kind StorageV2 \
+        --https-only true \
+        --min-tls-version TLS1_2
 
       echo "=== Creating Virtual Network ==="
       az network vnet create \
